@@ -4,6 +4,7 @@ import time
 import math
 from sklearn.cluster import k_means  # 该函数在使用时请使用解释器 kmeansChange
 import pandas as pd
+from DP_security import DP_security
 import matplotlib.pyplot as plt
 from sys import  argv
 '''下载数据集，返回全部数据列表以及坐标列表'''
@@ -61,7 +62,7 @@ def rough_dist2(lon1,lat1,lon2,lat2):   # 0.0044966  0.0059352
 
 
 '''对所有坐标进行聚类'''
-def Dp(dbName, data_lines, dataMat, user_lists, k, p, u, HS, tableStr):
+def Dp(dbName, data_lines, dataMat, user_lists, k, p, u, HS, tableStr, tableName_obf):
     print(k)
     #数据库，全部数据集，全部坐标集，k个聚类，p迭代次数,u扰动参数，HS敏感度，添加的城市字段以及扰动参数
     dataSet = np.array(dataMat)
@@ -190,10 +191,12 @@ def Dp(dbName, data_lines, dataMat, user_lists, k, p, u, HS, tableStr):
     cursor.close()
     conn.close()
     print("所有操作均结束完毕！并且有", number_change_spot_1, "条数据是因为placeid的改变；", number_change_spot, "条数据被替换了坐标。")
-    # file = open("G:/pyfile/relation_protect/src/data/result_data/" + dbName + ".txt", 'a', encoding='UTF-8')
-    # file.write(tablename + ' ' + str(number_change_spot_1) + ' ' + str(number_change_spot) + '\n')
-    # file.close()
+    file = open("G:/pyfile/relation_protect/src/data/result_data/DP.txt", 'a', encoding='UTF-8')
+    file.write(str(number_change_spot_1) + ' ' + str(number_change_spot) + ' ')
+    file.close()
     # 因为数据增删之后重复数据比较多，所以会存在替换了位置的数据反而比替换了地点ID的数据量还要大
+    dp_se = DP_security(tablename, tableName_obf)
+    dp_se.security_unility()
 
 
 def DpFile(tableName, dbName, u, p, k, tableStr):
@@ -212,31 +215,33 @@ def DpFile(tableName, dbName, u, p, k, tableStr):
     for x in str(u).split('.'):
         uStr += x
     tableStr += uStr
-    Dp(dbName, data_lines, dataMat, user_lists, k, p, u, HS, tableStr)
+    Dp(dbName, data_lines, dataMat, user_lists, k, p, u, HS, tableStr, tableName)
     # 原始数据库，原始数据集列表，原始数据集坐标列表，用户列表，自行指定聚类个数，自行指定迭代次数，自行指定扰动参数，全局敏感度，自行指定添加的说明字符串
     # 差分隐私扰动完后生成的数据表名 'Ori_Dp_Dist_all_data_cluster_weight_select_result_' + str(k) + str(p)+ '_'+tableStr，用于下一个文件背景扩充使用
 
 
 if __name__ == '__main__':
     # cluster_num = [31, 17, 27, 33]
-    cluster_num = [15]
+    # cluster_num = [15]
     # e1 = float(argv[1])
+    cluster_num = [31, 17, 33]
     i = 0
-    city = "Gowalla_AS"
-    for city in ["SF", "FS_NY_1"]:
+    # city = "Gowalla_AS"
+    for city in ["Gowalla_AS", "SF", "FS_NY_1"]:
+        for j in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]:
     # for city in ["Gowalla_AS"]:
-        print(cluster_num[i])
-        time_start1 = time.time()  # 差分隐私函数，需要自定义函数内的多个参数，***************************修改解释器**********************
-        # dbNameSF = "F://Document//database//gowalla//Gowalla0202_second.db"
-        dbNameSF = "G:/pyfile/relation_protect/src/data/city_data/" + city + ".db"
-        DpFile(city, dbNameSF, 0.1, 300, cluster_num[i], city)
-        DpFile(city, dbNameSF, 1, 300, cluster_num[i], city)
-        DpFile(city, dbNameSF, 3, 300, cluster_num[i], city)
-        DpFile(city, dbNameSF, 5, 300, cluster_num[i], city)
-        # DpFile(city, dbNameSF, 7, 300, cluster_num[i], city)
-        # DpFile(city, dbNameSF, 8, 300, cluster_num[i], city)
-        DpFile(city, dbNameSF, 10, 300, cluster_num[i], city)
-        # DpFile(city, dbNameSF, 12, 300, cluster_num[i], city)
-        # i += 1
-        time_end1 = time.time()  # 一个小时
+    #         print(cluster_num[i])
+            time_start1 = time.time()  # 差分隐私函数，需要自定义函数内的多个参数，***************************修改解释器**********************
+            # dbNameSF = "F://Document//database//gowalla//Gowalla0202_second.db"
+            dbNameSF = "G:/pyfile/relation_protect/src/data/city_data/" + city + ".db"
+            DpFile(city, dbNameSF, 0.1, 300, cluster_num[i], city+str(i))
+            DpFile(city, dbNameSF, 1, 300, cluster_num[i], city+str(i))
+            DpFile(city, dbNameSF, 3, 300, cluster_num[i], city+str(i))
+            DpFile(city, dbNameSF, 5, 300, cluster_num[i], city+str(i))
+            # DpFile(city, dbNameSF, 7, 300, cluster_num[i], city)
+            # DpFile(city, dbNameSF, 8, 300, cluster_num[i], city)
+            DpFile(city, dbNameSF, 10, 300, cluster_num[i], city+str(i))
+            # DpFile(city, dbNameSF, 12, 300, cluster_num[i], city)
+            time_end1 = time.time()  # 一个小时
+        i += 1
     print("差分隐私扰动花费的时间是：", (time_end1-time_start1)/60, "分钟。")

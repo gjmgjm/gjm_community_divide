@@ -140,7 +140,7 @@ class DP_security():
         print("dis", distance)
         return distance
 
-    def security_unility(self, u):
+    def security_unility(self):
         a = self.a_security()
         b = self.b_security(3)
         c = self.c_security(100)
@@ -148,7 +148,7 @@ class DP_security():
         e = self.e_security()
         g = self.g_secutity()
         file = open("G:/pyfile/relation_protect/src/data/result_data/DP.txt", 'a', encoding='UTF-8')
-        file.write('安全性:' + ' ' + 'a:' + str(a) + ' ' + '可用性:' + 'b:' + str(b) + ' ' + 'c:' + str(c)
+        file.write('安全性:' + ' ' + 'a:' + str(a) + ' ' + 'b:' + str(b) + ' ' + 'c:' + str(c)
                    + ' ' + 'd:' + str(d) + ' ' + 'e:' + str(e)
                    + ' ' + 'g:' + str(g)
                    + '\n')
@@ -166,7 +166,7 @@ if __name__ == "__main__":
     #     print(city)
         for i in ["01", "1", "3", "5", "10"]:
                 dp_se = DP_security("dp_result_" + str(cluster_num[j])+"_300_" + city + i, city)
-                dp_se.security_unility(i)
+                dp_se.security_unility()
     # dp_se.b_security(3)
     # dp_se.c_security(100)
     # dp_se.g_secutity()
@@ -174,4 +174,3 @@ if __name__ == "__main__":
     # dp_se.e_security()
     # dp_se.a_security()
         # j += 1
-    pass
